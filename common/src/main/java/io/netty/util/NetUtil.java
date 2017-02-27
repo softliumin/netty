@@ -960,14 +960,26 @@ public final class NetUtil {
         return sb.append(':').append(port).toString();
     }
 
+    /**
+     * Returns the {@link String} representation of a host port combo.
+     */
+    public static String toSocketAddressString(String hostString, int port) {
+        return newSocketAddressStringBuilder(
+                hostString, String.valueOf(port), isValidIpV4Address(hostString)).append(port).toString();
+    }
+
     private static StringBuilder newSocketAddressStringBuilder(String hostString, String port, boolean ipv4) {
         if (ipv4) {
             // Need to include enough space for hostString:port.
             return new StringBuilder(hostString.length() + 1 + port.length()).append(hostString);
         }
         // Need to include enough space for [hostString]:port.
-        return new StringBuilder(
-                hostString.length() + 3 + port.length()).append('[').append(hostString).append(']');
+        StringBuilder stringBuilder = new StringBuilder(
+                hostString.length() + 3 + port.length());
+        if (!hostString.isEmpty() && hostString.charAt(0) == '[' && hostString.charAt(hostString.length() - 1) == ']') {
+            return stringBuilder.append(hostString);
+        }
+        return stringBuilder.append('[').append(hostString).append(']');
     }
 
     /**
